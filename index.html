@@ -1,7 +1,15 @@
 <html>
     <head>
+          <title>What To Clebrate Today</title>
+    </head>
+    <body>
+
+        <h3>Today we celebrate</h3>
+        <h1 id="topic">New Day Started</h1>
+        
         <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
+            import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
             import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
 
             const firebaseConfig = {
@@ -11,28 +19,32 @@
               storageBucket: "whattocelebratetoday.appspot.com",
               messagingSenderId: "843437491468",
               appId: "1:843437491468:web:7bcfcba55208df1d60f529",
-              measurementId: "G-TWCBZET85E"
+              measurementId: "G-TWCBZET85E",
+              databaseURL: "https://whattocelebratetoday-default-rtdb.europe-west1.firebasedatabase.app",
             };
+
           
             const app = initializeApp(firebaseConfig);
             const analytics = getAnalytics(app);
+            const database = getDatabase(app);
 
-            const booksRef = app.firestore().collection('fBqTd8SGV69sez8D5oQv');
+            window.app = app
+            window.database = database
 
-            booksRef
-                .get()
-                .then((snapshot) => {
-                    const data = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    }));
-                    console.log("All data in 'fBqTd8SGV69sez8D5oQv' collection", data); 
-                });
+            function writeTodayTopic(msg) {
+                set(ref(database, 'topic'), { topic: msg });
+            }
+
+            window.writeTodayTopic = writeTodayTopic
+
+            const topic = ref(database, 'topic');
+            onValue(topic, (snapshot) => {
+                const data = snapshot.val();
+                document.querySelector("#topic").innerHTML = data.topic || "New Day Started"
+            });
+
+
+
           </script>
-
-          <title>What To Clebrate Today</title>
-    </head>
-    <body>
-        
     </body>
 </html>
