@@ -38,19 +38,28 @@
             const analytics = getAnalytics(app);
             const database = getDatabase(app);
 
-            window.app = app
-            window.database = database
-
-            function writeTodayTopic(msg) {
+            function write(msg) {
                 set(ref(database, 'topic'), { topic: msg });
             }
 
-            window.writeTodayTopic = writeTodayTopic
+            function reload(msg) {
+                set(ref(database, 'reload'), { justRandom: Math.random().toFixed(10) });
+            }
+
+            window.write = write
+            window.reload = reload
 
             const topic = ref(database, 'topic');
             onValue(topic, (snapshot) => {
                 const data = snapshot.val();
                 document.querySelector("#topic").innerHTML = data.topic || "New Day Started"
+            });
+
+            const reloadMsg = ref(database, 'reload');
+            let isFirstDataReceived = false
+            onValue(reloadMsg, (snapshot) => {
+                if (!isFirstDataReceived) isFirstDataReceived = true
+                else location.reload()
             });
 
 
